@@ -22,7 +22,8 @@ class PageUnliker < Sinatra::Application
       @likes = @graph.graph_call("/me/likes")
       # or publish to someone else (if you have the permissions too ;) )
       # @graph.put_wall_post("Checkout my new cool app!", {}, "someoneelse's id")
-      erb :"likes.html"
+      @session = session['access_token']
+      erb :"likes.html", layout: :"layout.html"
     else
       '<a href="/login">Login</a>'
     end

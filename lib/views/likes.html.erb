@@ -1,26 +1,67 @@
-<% @likes.each do |like| %>
-	<p><strong><%= like["id"] %></strong> - <%= like["name"] %></p>
-<% end %>
+<div class="likes">
+	<% @likes.each do |like| %>
+		<div class="like" data-id=<%= like["id"] %>>
+			<img src="<%= @graph.get_picture(like["id"], type: :square) %>">
+			<h4><%= like["name"] %></h4>
+		</div>
+	<% end %>
 
-<a id="loadnext" data-after="<%= @likes.paging["next"] %>" href="#">Load next</a>
+	<a id="loadnext" data-after="<%= @likes.paging["next"] %>" href="#">Load more</a>
+</div>
 
 <script>
+	// Loading the FB API
+	 window.fbAsyncInit = function() {
+    FB.init({
+      appId      : "<%= ENV['fb_id'] %>",
+      xfbml      : true,
+      version    : 'v2.6'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+  var placehold = function(element) {
+  	element.setAttribute('src', "http://www.adweek.com/socialtimes/wp-content/uploads/sites/2/2013/01/pages-flag.png")
+  }
+
 	var link = document.getElementById("loadnext");
-	link.onclick = function(){
+	link.onclick = function(e){
+		e.preventDefault();
 		var r = new XMLHttpRequest();
 		r.open("GET", this.getAttribute('data-after'), true);
 		r.onreadystatechange = function () {
 		  if (r.readyState != 4 || r.status != 200) return;
-		  console.log(JSON.parse(r.response));
 		  var response = JSON.parse(r.response);
 		  var nextLink = response.paging.next
 		  if (nextLink) {
 			  link.setAttribute('data-after', nextLink);
-			  for(var i=0; i < response.data.length; i++){
-			  	var p = document.createElement('p');
-			  	p.innerHTML = "<strong>"+ response.data[i].id +"</strong> - "+ response.data[i].name;
-			  	document.body.appendChild(p);
-			  	document.body.appendChild(link);
+			  var likes = response.data;
+			  for(var i=0; i < likes.length; i++){
+
+					FB.api(
+				    "/"+likes[i].id+"/picture",
+				    function(likeObject){
+					    return function(response){
+					      if (response && !response.error) {
+					      	var image = response.data.url;
+
+	    						var like = document.createElement('div');
+							  	like.setAttribute('class', 'like');
+							  	like.setAttribute('data-id', likeObject.id);
+							  	like.innerHTML = "<img src=\""+image+"\" onerror=\"placehold(this);\">";
+							  	like.innerHTML += "<h4>"+ likeObject.name +"</h4>";
+							  	document.getElementsByClassName("likes")[0].appendChild(like);
+							  	document.getElementsByClassName("likes")[0].appendChild(link);
+					      };
+					    }
+				    }(likes[i]));
 			  }
 		  } else {
 		  	link.style.display = "none";
