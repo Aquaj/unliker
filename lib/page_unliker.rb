@@ -12,7 +12,7 @@ class PageUnliker < Sinatra::Application
 	# your app secret
 	APP_SECRET = ENV["fb_secret"]
 
-  use Rack::Session::Cookie, secret: 'PUT_A_GOOD_SECRET_IN_HERE'
+  use Rack::Session::Cookie, secret: 'dassomegoodsecretrighthere'
 
   get '/' do
     if session['access_token']
@@ -22,6 +22,7 @@ class PageUnliker < Sinatra::Application
       @likes = @graph.graph_call("/me/likes")
       # or publish to someone else (if you have the permissions too ;) )
       # @graph.put_wall_post("Checkout my new cool app!", {}, "someoneelse's id")
+      erb :"likes.html"
     else
       '<a href="/login">Login</a>'
     end
@@ -31,7 +32,7 @@ class PageUnliker < Sinatra::Application
     # generate a new oauth object with your app data and your callback url
     session['oauth'] = Koala::Facebook::OAuth.new(APP_ID, APP_SECRET, "#{request.base_url}/callback")
     # redirect to facebook to get your code
-    redirect session['oauth'].url_for_oauth_code()
+    redirect session['oauth'].url_for_oauth_code(permissions: "user_likes")
   end
 
   get '/logout' do

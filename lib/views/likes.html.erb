@@ -1,0 +1,31 @@
+<% @likes.each do |like| %>
+	<p><strong><%= like["id"] %></strong> - <%= like["name"] %></p>
+<% end %>
+
+<a id="loadnext" data-after="<%= @likes.paging["next"] %>" href="#">Load next</a>
+
+<script>
+	var link = document.getElementById("loadnext");
+	link.onclick = function(){
+		var r = new XMLHttpRequest();
+		r.open("GET", this.getAttribute('data-after'), true);
+		r.onreadystatechange = function () {
+		  if (r.readyState != 4 || r.status != 200) return;
+		  console.log(JSON.parse(r.response));
+		  var response = JSON.parse(r.response);
+		  var nextLink = response.paging.next
+		  if (nextLink) {
+			  link.setAttribute('data-after', nextLink);
+			  for(var i=0; i < response.data.length; i++){
+			  	var p = document.createElement('p');
+			  	p.innerHTML = "<strong>"+ response.data[i].id +"</strong> - "+ response.data[i].name;
+			  	document.body.appendChild(p);
+			  	document.body.appendChild(link);
+			  }
+		  } else {
+		  	link.style.display = "none";
+		  }
+		};
+		r.send();
+	}
+</script>
