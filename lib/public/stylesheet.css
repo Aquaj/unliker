@@ -68,20 +68,20 @@ a#loadnext span {
 }
 
 .like {
-	display: flex;
-	flex-basis: 100%;
-	align-items: center;
-	justify-items: center;
+	flex-basis: 33%;
 }
 
-@media (min-width : 768px) and (max-width : 1024px) {
+@media (min-width : 600px) {
 	.like {
-	flex-basis: 50%;
+		display: flex;
+		flex-basis: 100%;
+		align-items: center;
+		justify-items: center;
 	}
 }
 
-@media (min-width : 1025px) {
+@media (min-width : 1024px) {
 	.like {
-	flex-basis: 33%;
+	flex-basis: 50%;
 	}
 }
