@@ -2,15 +2,15 @@
 require 'bundler'
 Bundler.require(:default)
 
-ConfigEnv.init("#{__dir__}/secret.rb")
-
-# register your app at facebook to get those infos
-# your app id
-APP_ID     = ENV["fb_id"]
-# your app secret
-APP_SECRET = ENV["fb_secret"]
-
 class PageUnliker < Sinatra::Application
+
+	ConfigEnv.init("#{__dir__}/config/secret.rb")
+
+	# register your app at facebook to get those infos
+	# your app id
+	APP_ID     = ENV["fb_id"]
+	# your app secret
+	APP_SECRET = ENV["fb_secret"]
 
   use Rack::Session::Cookie, secret: 'PUT_A_GOOD_SECRET_IN_HERE'
 
