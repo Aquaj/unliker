@@ -28,20 +28,20 @@ body {
 	border: 1px solid black;
 }
 
-body div:nth-last-child(2) {
+body > div:nth-last-of-type(2) {
 	flex: 1;
 }
 
 .likes {
 	display: flex;
 	flex-wrap: wrap;
+	align-content: flex-start;
 }
 
-.likes a {
+a#loadnext {
 	width: 100%;
 	background-color: #44ccee;
 	border-radius: 2px;
-	padding: 5px 10px;
 	text-align: center;
 	vertical-align: middle;
 	font-weight: bold;
@@ -50,20 +50,38 @@ body div:nth-last-child(2) {
 	line-height: 48px;
 	color: white;
 	text-decoration: none;
-	margin-top: 10px;
 }
 
-.like {
-	flex-basis: 100%;
+a#loadnext span {
+	margin: 5px 10px;
 }
 
 .like img, .like h4 {
-	display: inline-block;
 	vertical-align: middle;
-	margin: 3px;
 }
 
 .like img {
+	display: inline-block;
+	margin: 3px;
 	max-height: 35px;
 	max-width: 35px;
+}
+
+.like {
+	display: flex;
+	flex-basis: 100%;
+	align-items: center;
+	justify-items: center;
+}
+
+@media only screen and (min-width : 768px) and (max-width : 1024px) {
+	.like {
+	flex-basis: 50%;
+	}
+}
+
+@media only screen and (min-width : 1025px) {
+	.like {
+	flex-basis: 33%;
+	}
 }

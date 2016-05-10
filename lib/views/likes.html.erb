@@ -1,47 +1,73 @@
-<div class="likes">
-	<% @likes.each do |like| %>
-		<div class="like" data-id=<%= like["id"] %>>
-			<img src="<%= @graph.get_picture(like["id"], type: :square) %>">
-			<h4><%= like["name"] %></h4>
-		</div>
-	<% end %>
-
-	<a id="loadnext" data-after="<%= @likes.paging["next"] %>" href="#">Load more</a>
-</div>
-
 <script>
-	// Loading the FB API
-	 window.fbAsyncInit = function() {
-    FB.init({
-      appId      : "<%= ENV['fb_id'] %>",
-      xfbml      : true,
-      version    : 'v2.6'
+	function statusChangeCallback(response) {
+	  // The response object is returned with a status field that lets the
+	  // app know the current login status of the person.
+	  // Full docs on the response object can be found in the documentation
+	  // for FB.getLoginStatus().
+	  if (response.status === 'connected') {
+	    // Logged into your app and Facebook.
+	    launchApp();
+	  } else if (response.status === 'not_authorized') {
+	    // The person is logged into Facebook, but not your app.
+	    document.getElementById('status').innerHTML = 'Please log ' +
+	      'into this app.';
+	  } else {
+	    // The person is not logged into Facebook, so we're not sure if
+	    // they are logged into this app or not.
+	    document.getElementById('status').innerHTML = 'Please log ' +
+	      'into Facebook.';
+	  }
+	}
+
+	function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
     });
-  };
-
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-
-  var placehold = function(element) {
-  	element.setAttribute('src', "http://www.adweek.com/socialtimes/wp-content/uploads/sites/2/2013/01/pages-flag.png")
   }
 
-	var link = document.getElementById("loadnext");
-	link.onclick = function(e){
-		e.preventDefault();
-		var r = new XMLHttpRequest();
-		r.open("GET", this.getAttribute('data-after'), true);
-		r.onreadystatechange = function () {
-		  if (r.readyState != 4 || r.status != 200) return;
-		  var response = JSON.parse(r.response);
+  var placehold = function(element) {
+		element.setAttribute('src', "http://www.adweek.com/socialtimes/wp-content/uploads/sites/2/2013/01/pages-flag.png")
+	};
+
+	var launchApp = function(){
+
+		// Adding Load More link
+		var likes = document.createElement('div');
+    likes.setAttribute("class", "likes");
+
+		var link = document.createElement('a');
+    link.setAttribute("id", "loadnext");
+    link.setAttribute("href", "#");
+    link.innerHTML = '<span>Load more</span>';
+		link.onclick = function(e){
+			e.preventDefault();
+			loadMore(this);
+		};
+
+    document.getElementsByTagName("fb:login-button")[0].style.display = "none";
+	  document.body.appendChild(likes);
+    document.body.appendChild(link);
+	  var filler = document.createElement('div');
+	  filler.setAttribute('id', 'filler');
+	  document.body.appendChild(filler);
+
+		var loadMore = function(link) {
+			var like_url = "/me/likes";
+			if (link.getAttribute("data-after")) { like_url+="?after="+link.getAttribute("data-after"); };
+			FB.api(
+				like_url,
+				function (response) {
+				  if (response && !response.error) {
+				    addLikes(response);
+				  }
+				}
+			);
+		};
+
+		var addLikes = function(response){
 		  var nextLink = response.paging.next
 		  if (nextLink) {
-			  link.setAttribute('data-after', nextLink);
+			  link.setAttribute('data-after', new RegExp('^.*facebook\.com/v\\d*\\.\\d*/.*after=(.*)(&.*)?$').exec(nextLink)[1]);
 			  var likes = response.data;
 			  for(var i=0; i < likes.length; i++){
 
@@ -58,15 +84,22 @@
 							  	like.innerHTML = "<img src=\""+image+"\" onerror=\"placehold(this);\">";
 							  	like.innerHTML += "<h4>"+ likeObject.name +"</h4>";
 							  	document.getElementsByClassName("likes")[0].appendChild(like);
-							  	document.getElementsByClassName("likes")[0].appendChild(link);
 					      };
 					    }
 				    }(likes[i]));
+					}
+			  } else {
+			  	link.style.display = "none";
 			  }
-		  } else {
-		  	link.style.display = "none";
-		  }
 		};
-		r.send();
-	}
+
+		loadMore(link);
+	};
+
+	document.addEventListener("fbload", function() {
+		checkLoginState();
+	});
+
 </script>
+
+<fb:login-button scope="likes" onlogin="checkLoginState();"></fb:login-button>
