@@ -20,7 +20,6 @@ class PageUnliker < Sinatra::Application
       @graph = Koala::Facebook::API.new(session["access_token"])
       # publish to your wall (if you have the permissions)
       @likes = @graph.graph_call("/me/likes")
-      byebug
       # or publish to someone else (if you have the permissions too ;) )
       # @graph.put_wall_post("Checkout my new cool app!", {}, "someoneelse's id")
     else
@@ -31,7 +30,6 @@ class PageUnliker < Sinatra::Application
   get '/login' do
     # generate a new oauth object with your app data and your callback url
     session['oauth'] = Koala::Facebook::OAuth.new(APP_ID, APP_SECRET, "#{request.base_url}/callback")
-    byebug
     # redirect to facebook to get your code
     redirect session['oauth'].url_for_oauth_code()
   end
@@ -46,7 +44,6 @@ class PageUnliker < Sinatra::Application
   get '/callback' do
     #get the access token from facebook with your code
     p session['access_token']
-    byebug
     session['access_token'] = session['oauth'].get_access_token(params[:code])
     redirect '/'
   end
