@@ -1,2 +1,2 @@
-require './lib/simple-ruby-facebook-example'
-run SimpleRubyFacebookExample
+require './lib/page_unliker'
+run PageUnliker

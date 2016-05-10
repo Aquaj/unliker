@@ -6,20 +6,19 @@ Bundler.require(:default)
 # your app id
 APP_ID     = 1047870338630310
 # your app secret
-APP_SECRET = '76dhf8656a75...'
+APP_SECRET = open("lib/fb_secret.yml").read()[0...-1]
 
-class SimpleRubyFacebookExample < Sinatra::Application
+class PageUnliker < Sinatra::Application
 
   use Rack::Session::Cookie, secret: 'PUT_A_GOOD_SECRET_IN_HERE'
 
   get '/' do
     if session['access_token']
       'You are logged in! <a href="/logout">Logout</a>'
-      # do some stuff with facebook here
-      # for example:
-      # @graph = Koala::Facebook::GraphAPI.new(session["access_token"])
+      @graph = Koala::Facebook::API.new(session["access_token"])
       # publish to your wall (if you have the permissions)
-      # @graph.put_wall_post("I'm posting from my new cool app!")
+      @likes = @graph.graph_call("/me/likes")
+      byebug
       # or publish to someone else (if you have the permissions too ;) )
       # @graph.put_wall_post("Checkout my new cool app!", {}, "someoneelse's id")
     else
@@ -30,6 +29,7 @@ class SimpleRubyFacebookExample < Sinatra::Application
   get '/login' do
     # generate a new oauth object with your app data and your callback url
     session['oauth'] = Koala::Facebook::OAuth.new(APP_ID, APP_SECRET, "#{request.base_url}/callback")
+    byebug
     # redirect to facebook to get your code
     redirect session['oauth'].url_for_oauth_code()
   end
@@ -43,8 +43,14 @@ class SimpleRubyFacebookExample < Sinatra::Application
   #method to handle the redirect from facebook back to you
   get '/callback' do
     #get the access token from facebook with your code
+    p session['access_token']
+    byebug
     session['access_token'] = session['oauth'].get_access_token(params[:code])
     redirect '/'
+  end
+
+  get '/privacy' do
+  	erb :"privacy.html", layout: :"layout.html"
   end
 end
 
