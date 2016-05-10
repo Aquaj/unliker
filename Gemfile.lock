@@ -3,6 +3,7 @@ GEM
   specs:
     addressable (2.3.8)
     byebug (8.2.5)
+    config_env (0.1.2)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     koala (2.0.0)
@@ -27,6 +28,7 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
+  config_env
   koala
   shotgun
   sinatra
