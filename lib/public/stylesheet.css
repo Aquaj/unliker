@@ -71,7 +71,7 @@ a#loadnext span {
 	flex-basis: 33%;
 }
 
-@media (min-width : 600px) {
+@media screen and (min-width : 600px) {
 	.like {
 		display: flex;
 		flex-basis: 100%;
@@ -80,7 +80,7 @@ a#loadnext span {
 	}
 }
 
-@media (min-width : 1024px) {
+@media screen and (min-width : 1024px) {
 	.like {
 	flex-basis: 50%;
 	}
