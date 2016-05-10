@@ -56,6 +56,10 @@ a#loadnext span {
 	margin: 5px 10px;
 }
 
+.like-container {
+	flex-basis: 33%;
+}
+
 .like img, .like h4 {
 	vertical-align: middle;
 }
@@ -68,20 +72,42 @@ a#loadnext span {
 }
 
 .like {
+	margin: 2px;
 	display: flex;
 	align-items: center;
 	justify-items: center;
-	flex-basis: 33%;
+	cursor: pointer;
+}
+
+.like.selected {
+	box-sizing: border-box;
+	border: 3px solid #44ccee;
+	position: relative;
+}
+
+.like.selected::before{
+	content: "✓";
+	color: white;
+	background-color: #44ccee;
+	position: absolute;
+	top: 0;
+	right: 0;
+	text-align: center;
+	vertical-align: center;
+	font-size: 16px;
+	line-height: 16px;
+	width: 16px;
+	height: 16px;
 }
 
 @media screen and (max-width : 1024px) {
-	.like {
-	flex-basis: 50%;
+	.like-container {
+		flex-basis: 50%;
 	}
 }
 
 @media screen and (max-width : 600px) {
-	.like {
+	.like-container {
 		flex-basis: 100%;
 	}
 }

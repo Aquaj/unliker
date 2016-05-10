@@ -64,6 +64,15 @@
 			);
 		};
 
+		var select = function() {
+			if (this.getAttribute("class").indexOf("selected") > -1){
+				this.setAttribute("class", this.getAttribute("class").replace("selected", ""));
+			} else {
+				this.setAttribute("class", this.getAttribute("class") + " selected");
+				this.class += "select";
+			};
+		};
+
 		var addLikes = function(response){
 		  var nextLink = response.paging.next
 		  if (nextLink) {
@@ -78,12 +87,16 @@
 					      if (response && !response.error) {
 					      	var image = response.data.url;
 
+					      	var like_container = document.createElement('div');
+					      	like_container.setAttribute('class', 'like-container');
 	    						var like = document.createElement('a');
+	    						like.onclick = select;
 							  	like.setAttribute('class', 'like');
 							  	like.setAttribute('data-id', likeObject.id);
 							  	like.innerHTML = "<img src=\""+image+"\" onerror=\"placehold(this);\">";
 							  	like.innerHTML += "<h4>"+ likeObject.name +"</h4>";
-							  	document.getElementsByClassName("likes")[0].appendChild(like);
+							  	like_container.appendChild(like);
+							  	document.getElementsByClassName("likes")[0].appendChild(like_container);
 					      };
 					    }
 				    }(likes[i]));
