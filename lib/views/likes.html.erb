@@ -78,7 +78,7 @@
 					      if (response && !response.error) {
 					      	var image = response.data.url;
 
-	    						var like = document.createElement('div');
+	    						var like = document.createElement('a');
 							  	like.setAttribute('class', 'like');
 							  	like.setAttribute('data-id', likeObject.id);
 							  	like.innerHTML = "<img src=\""+image+"\" onerror=\"placehold(this);\">";
