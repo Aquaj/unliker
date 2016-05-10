@@ -6,7 +6,7 @@ ConfigEnv.init("#{__dir__}/secret.rb")
 
 # register your app at facebook to get those infos
 # your app id
-APP_ID     = 1047870338630310
+APP_ID     = ENV["fb_id"]
 # your app secret
 APP_SECRET = ENV["fb_secret"]
 

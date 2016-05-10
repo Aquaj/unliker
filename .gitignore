@@ -1,2 +1,2 @@
-lib/fb_secret.yml
+lib/config/secret.rb
 .byebug_history
