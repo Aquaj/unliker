@@ -2,11 +2,13 @@
 require 'bundler'
 Bundler.require(:default)
 
+ConfigEnv.init("#{__dir__}/secret.rb")
+
 # register your app at facebook to get those infos
 # your app id
 APP_ID     = 1047870338630310
 # your app secret
-APP_SECRET = open("lib/fb_secret.yml").read()[0...-1]
+APP_SECRET = ENV["fb_secret"]
 
 class PageUnliker < Sinatra::Application
 
