@@ -103,7 +103,11 @@
 		}
 
 		var addLikes = function(response){
-		  var nextLink = response.paging.next
+		  var paging = response.paging
+		  var nextLink;
+		  if (paging) {
+			  nextLink = response.paging.next
+		  }
 		  if (nextLink) {
 			  link.setAttribute('data-after', new RegExp('^.*facebook\.com/v\\d*\\.\\d*/.*after=(.*)(&.*)?$').exec(nextLink)[1]);
 			} else {
