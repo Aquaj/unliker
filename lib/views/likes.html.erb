@@ -30,6 +30,7 @@
 
 		var link = document.createElement('a');
     link.setAttribute("id", "loadnext");
+    link.setAttribute("class", "button");
     link.setAttribute("href", "#");
     link.innerHTML = '<span>Load more</span>';
 		link.onclick = function(e){
@@ -37,19 +38,22 @@
 			loadMore(this);
 		};
 
-		var unlink = document.createElement('a');
-    unlink.setAttribute("id", "unlike");
-    unlink.setAttribute("href", "#");
-    unlink.innerHTML = '<span>Unlike selected.</span>';
-		unlink.onclick = function(e){
-			e.preventDefault();
-			unlike();
-		};
+//		If FB ever makes an Unlike endpoint.
+//
+//		var unlink = document.createElement('a');
+//    unlink.setAttribute("id", "unlike");
+//    unlink.setAttribute("class", "button");
+//    unlink.setAttribute("href", "#");
+//    unlink.innerHTML = '<span>Unlike selected.</span>';
+//		unlink.onclick = function(e){
+//			e.preventDefault();
+//			unlike();
+//		};
 
     document.getElementsByTagName("fb:login-button")[0].style.display = "none";
 	  document.body.appendChild(likes);
     document.body.appendChild(link);
-    document.body.appendChild(unlink);
+//    document.body.appendChild(unlink);
 	  var filler = document.createElement('div');
 	  filler.setAttribute('id', 'filler');
 	  document.body.appendChild(filler);
@@ -102,65 +106,61 @@
 		  var nextLink = response.paging.next
 		  if (nextLink) {
 			  link.setAttribute('data-after', new RegExp('^.*facebook\.com/v\\d*\\.\\d*/.*after=(.*)(&.*)?$').exec(nextLink)[1]);
-			  var likes = response.data;
-			  for(var i=0; i < likes.length; i++){
+			} else {
+			 	link.style.display = "none";
+			}
+		  var likes = response.data;
+		  for(var i=0; i < likes.length; i++){
 
-					FB.api(
-				    "/"+likes[i].id+"/picture",
-				    function(likeObject){
-					    return function(response){
-					      if (response && !response.error) {
-					      	var image = response.data.url;
+				FB.api(
+			    "/"+likes[i].id+"/picture",
+			    function(likeObject, pos, len){
+				    return function(response){
+				      if (response && !response.error) {
+				      	var image = response.data.url;
 
-					      	var like_container = document.createElement('div');
-					      	like_container.setAttribute('class', 'like-container');
-	    						var like = document.createElement('a');
-	    						like.onclick = select;
-							  	like.setAttribute('class', 'like');
-							  	like.setAttribute('data-id', likeObject.id);
-							  	like.innerHTML = "<img src=\""+image+"\" onerror=\"placehold(this);\">";
-							  	like.innerHTML += "<h4>"+ likeObject.name +"</h4>";
+// In case FB ever makes an Unlike endpoint for its API
+// 											¯\_(ツ)_/¯
+//
+//    						var like = document.createElement('a');
+//    						like.onclick = select;
+//						  	like.setAttribute('class', 'like');
+//						  	like.setAttribute('data-id', likeObject.id);
+//						  	like.innerHTML = "<img src=\""+image+"\" onerror=\"placehold(this);\">";
+//						  	like.innerHTML += "<h4>"+ likeObject.name +"</h4>";
+//
+///////////////////////////////////////////////////////
 
-							  	var page_plugin = document.createElement("div");
-							  	page_plugin.setAttribute("class", "fb-page");
-							  	page_plugin.setAttribute("data-href", "https://www.facebook.com/"+likeObject.id);
-							  	page_plugin.setAttribute("data-tabs", "timeline");
-							  	page_plugin.setAttribute("data-width", "180");
-							  	page_plugin.setAttribute("data-height", "70");
-							  	page_plugin.setAttribute("data-small-header", "true");
-									page_plugin.setAttribute("data-adapt-container-width", "true");
-									page_plugin.setAttribute("data-hide-cover", "true");
-									page_plugin.setAttribute("data-show-facepile", "false");
-									var parse_ignore = document.createElement("div");
-									parse_ignore.setAttribute("class", "fb-xfbml-parse-ignore");
-									var bquote = document.createElement("blockquote");
-									bquote.setAttribute("cite", "https://www.facebook.com/"+likeObject.id);
-									var likelink = document.createElement("a");
-									likelink.setAttribute("href", "http://www.facebook.com/"+likeObject.id);
-									likelink.innerHTML = "&lt;"+likeObject.name+" /&gt;"
-									bquote.appendChild(likelink);
-									parse_ignore.appendChild(bquote);
-									page_plugin.appendChild(parse_ignore);
+								var like_container = document.createElement('div');
+				      	like_container.setAttribute('class', 'like-container');
 
-							  	//like_container.appendChild(like);
-							  	like_container.appendChild(page_plugin);
-							  	document.getElementsByClassName("likes")[0].appendChild(like_container);
-					      };
-					    }
-				    }(likes[i]));
-					}
-			  } else {
-			  	link.style.display = "none";
-			  }
+				      	var plugin_url = "http://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F"+ likeObject.id +"%2F&tabs=timeline&width=340&height=70&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=false"
+				      	var plugin_iframe = document.createElement("iframe");
+				      	plugin_iframe.setAttribute("src", plugin_url);
+				      	plugin_iframe.setAttribute("width", "340");
+				      	plugin_iframe.setAttribute("height", "70");
+				      	plugin_iframe.setAttribute("style", "border:none;overflow:hidden");
+				      	plugin_iframe.setAttribute("scrolling", "no");
+				      	plugin_iframe.setAttribute("frameborder", "0");
+				      	plugin_iframe.setAttribute("allowTransparency", "true");
+
+						  	//like_container.appendChild(like);
+						  	like_container.appendChild(plugin_iframe);
+						  	document.getElementsByClassName("likes")[0].appendChild(like_container);
+				      };
+				    }
+			    }(likes[i], i, likes.length)
+				);
+			}
 		};
 
 		loadMore(link);
 	};
 
 	document.addEventListener("fbload", function() {
-		//checkLoginState();
+			checkLoginState();
 	});
 
 </script>
 
-<fb:login-button scope="user_likes,publish_actions" onlogin="checkLoginState();"></fb:login-button>
+<fb:login-button scope="user_likes" onlogin="checkLoginState();"></fb:login-button>

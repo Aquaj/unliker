@@ -38,10 +38,12 @@ body > div:nth-last-of-type(2) {
 	align-content: flex-start;
 }
 
-a#loadnext {
+.button {
 	width: 100%;
 	background-color: #44ccee;
+	box-sizing: border-box;
 	border-radius: 2px;
+	border: 1px solid #fff;
 	text-align: center;
 	vertical-align: middle;
 	font-weight: bold;
@@ -52,12 +54,18 @@ a#loadnext {
 	text-decoration: none;
 }
 
-a#loadnext span {
+.button span {
 	margin: 5px 10px;
 }
 
 .like-container {
 	flex-basis: 33%;
+	display: flex;
+	justify-content: center;
+}
+
+.like-container iframe {
+	margin: 2px;
 }
 
 .like img, .like h4 {
