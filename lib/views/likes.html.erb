@@ -7,15 +7,8 @@
 	  if (response.status === 'connected') {
 	    // Logged into your app and Facebook.
 	    launchApp();
-	  } else if (response.status === 'not_authorized') {
-	    // The person is logged into Facebook, but not your app.
-	    document.getElementById('status').innerHTML = 'Please log ' +
-	      'into this app.';
 	  } else {
-	    // The person is not logged into Facebook, so we're not sure if
-	    // they are logged into this app or not.
-	    document.getElementById('status').innerHTML = 'Please log ' +
-	      'into Facebook.';
+	    alert("An error occurred.");
 	  }
 	}
 
@@ -44,9 +37,19 @@
 			loadMore(this);
 		};
 
+		var unlink = document.createElement('a');
+    unlink.setAttribute("id", "unlike");
+    unlink.setAttribute("href", "#");
+    unlink.innerHTML = '<span>Unlike selected.</span>';
+		unlink.onclick = function(e){
+			e.preventDefault();
+			unlike();
+		};
+
     document.getElementsByTagName("fb:login-button")[0].style.display = "none";
 	  document.body.appendChild(likes);
     document.body.appendChild(link);
+    document.body.appendChild(unlink);
 	  var filler = document.createElement('div');
 	  filler.setAttribute('id', 'filler');
 	  document.body.appendChild(filler);
@@ -69,9 +72,31 @@
 				this.setAttribute("class", this.getAttribute("class").replace("selected", ""));
 			} else {
 				this.setAttribute("class", this.getAttribute("class") + " selected");
-				this.class += "select";
 			};
 		};
+
+		var unlike = function() {
+			var toUnlike = document.getElementsByClassName("selected");
+			for (var i = 0; i < toUnlike.length; i++ ){
+				FB.api(
+			    "/"+toUnlike[i].getAttribute("data-id")+"/likes",
+			    "DELETE",
+			    function (response) {
+			    	console.log(response);
+			      if (response && !response.error) {
+			      	console.log("unliking "+toUnlike[i].getAttribute("data-id"));
+			        toUnlike[i].parentElement.style.display = "none";
+			      }
+			    }
+			  );
+			}
+			var r = new XMLHttpRequest();
+			r.open("POST", "http://www.facebook.com/ajax/pages/fan_status.php?dpr=1");
+			r.onreadystatechange = function() {
+				console.log(r.response);
+			}
+			r.send("fbpage_id=145002615551147&add=false&reload=false&fan_origin=liked_menu&fan_source&cat&actor_id&__user=1388743871&__a=1&__dyn=aKTyAW8-aloAwmgDDzbGyai8AgmzFEZz8-8GAdyeGBQC-CGm4rmnxnCWyWG2aifhKagByAp2WCGq4KE-aCK9V9EC22cyWDyV9B8V8yu23FeeKmjBQFWxdkehp8iAWyUigOfgC4VVarBBwxKqiUCFki9LzEnUObKcAyVFQaUx5GUOeiyoKqmQSF9ah9qox2Q&__req=b&__be=0&__pc=EXP1%3ADEFAULT&fb_dtsg=AQFo7Y6s_kd0%3AAQGR8ZxMkca0&ttstamp=265817011155895411595107100485865817182569012077107999748&__rev=2329596");
+		}
 
 		var addLikes = function(response){
 		  var nextLink = response.paging.next
@@ -95,7 +120,30 @@
 							  	like.setAttribute('data-id', likeObject.id);
 							  	like.innerHTML = "<img src=\""+image+"\" onerror=\"placehold(this);\">";
 							  	like.innerHTML += "<h4>"+ likeObject.name +"</h4>";
-							  	like_container.appendChild(like);
+
+							  	var page_plugin = document.createElement("div");
+							  	page_plugin.setAttribute("class", "fb-page");
+							  	page_plugin.setAttribute("data-href", "https://www.facebook.com/"+likeObject.id);
+							  	page_plugin.setAttribute("data-tabs", "timeline");
+							  	page_plugin.setAttribute("data-width", "180");
+							  	page_plugin.setAttribute("data-height", "70");
+							  	page_plugin.setAttribute("data-small-header", "true");
+									page_plugin.setAttribute("data-adapt-container-width", "true");
+									page_plugin.setAttribute("data-hide-cover", "true");
+									page_plugin.setAttribute("data-show-facepile", "false");
+									var parse_ignore = document.createElement("div");
+									parse_ignore.setAttribute("class", "fb-xfbml-parse-ignore");
+									var bquote = document.createElement("blockquote");
+									bquote.setAttribute("cite", "https://www.facebook.com/"+likeObject.id);
+									var likelink = document.createElement("a");
+									likelink.setAttribute("href", "http://www.facebook.com/"+likeObject.id);
+									likelink.innerHTML = "&lt;"+likeObject.name+" /&gt;"
+									bquote.appendChild(likelink);
+									parse_ignore.appendChild(bquote);
+									page_plugin.appendChild(parse_ignore);
+
+							  	//like_container.appendChild(like);
+							  	like_container.appendChild(page_plugin);
 							  	document.getElementsByClassName("likes")[0].appendChild(like_container);
 					      };
 					    }
@@ -110,9 +158,9 @@
 	};
 
 	document.addEventListener("fbload", function() {
-		checkLoginState();
+		//checkLoginState();
 	});
 
 </script>
 
-<fb:login-button scope="likes" onlogin="checkLoginState();"></fb:login-button>
+<fb:login-button scope="user_likes,publish_actions" onlogin="checkLoginState();"></fb:login-button>
